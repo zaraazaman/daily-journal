@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events</title>
+
+  <link rel="stylesheet" href="theme.css">
+  <script defer src="theme.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="transition-colors duration-300">
+
+  <div class="container mx-auto px-6 py-8">
+    <div class="flex items-center gap-3 mb-6">
+      <svg class="w-10 h-10 theme-primary-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="4" ry="4" class="theme-primary-stroke" fill="currentColor" opacity="0.1"/>
+    <line x1="3" y1="10" x2="21" y2="10" class="theme-primary-stroke"/>
+    <line x1="8" y1="2" x2="8" y2="6" class="theme-primary-stroke"/>
+    <line x1="16" y1="2" x2="16" y2="6" class="theme-primary-stroke"/>
+    <circle cx="8" cy="14" r="1.5" class="theme-primary-fill"/>
+    <circle cx="12" cy="14" r="1.5" class="theme-primary-fill"/>
+    <circle cx="16" cy="14" r="1.5" class="theme-primary-fill"/>
+  </svg>
+      <h1 id="eventHeading" class="text-4xl font-bold theme-primary-text">Events</h1>
+    </div>
+
+    <p class="theme-secondary-text mb-6 max-w-xl">
+      Plan your events and keep track of upcoming activities. Select a category, set date and time, and add a note to stay organized!
+    </p>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+      <div class="flex-1 space-y-4">
+        <div class="flex justify-between items-center gap-3">
+          <select id="eventCategory" class="px-3 py-2 rounded-xl border theme-border theme-text flex-1">
+            <option value="">Select Category</option>
+            <option value="personal">Personal</option>
+            <option value="work">Work</option>
+            <option value="social">Social</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="datetime-local" id="eventTime" class="px-3 py-2 rounded-xl border theme-border theme-text flex-1"/>
+        </div>
+
+        <input type="text" id="eventTitle" placeholder="Event Title..." class="w-full px-4 py-3 rounded-2xl border theme-border theme-text focus:outline-none focus:ring-2 theme-ring"/>
+        <textarea id="eventDesc" rows="3" placeholder="Event Description (optional)" class="w-full px-4 py-3 rounded-2xl border theme-border theme-text focus:outline-none focus:ring-2 theme-ring"></textarea>
+
+        <div class="flex gap-3">
+          <button id="addEventBtn" class="flex-1 px-4 py-2 rounded-xl font-medium theme-button">Add Event</button>
+          <button id="clearEventsBtn" class="flex-1 px-4 py-2 rounded-xl font-medium theme-button">Clear All</button>
+        </div>
+
+        <div id="eventListWrapper" class="mt-4 max-h-[500px] overflow-y-auto space-y-2">
+          <div id="eventList"></div>
+        </div>
+      </div>
+
+      <div class="w-full lg:w-64 space-y-4">
+        <div class="theme-card p-4 rounded-2xl shadow-md space-y-2">
+          <h3 class="font-semibold theme-text">Events Added: <span id="eventsAdded">0</span></h3>
+          <h3 class="font-semibold theme-text">Upcoming Events: <span id="eventsUpcoming">0</span></h3>
+          <h3 class="font-semibold theme-text">Past Events: <span id="eventsPast">0</span></h3>
+        </div>
+
+        <div id="eventQuote" class="theme-card p-4 rounded-2xl shadow-md theme-secondary-text italic text-center transition-opacity duration-500"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const eventCategory = document.getElementById('eventCategory');
+    const eventTime = document.getElementById('eventTime');
+    const eventTitle = document.getElementById('eventTitle');
+    const eventDesc = document.getElementById('eventDesc');
+    const addEventBtn = document.getElementById('addEventBtn');
+    const clearEventsBtn = document.getElementById('clearEventsBtn');
+    const eventList = document.getElementById('eventList');
+    const eventsAdded = document.getElementById('eventsAdded');
+    const eventsUpcoming = document.getElementById('eventsUpcoming');
+    const eventsPast = document.getElementById('eventsPast');
+    const eventQuote = document.getElementById('eventQuote');
+
+    let events = [];
+
+    const eventQuotes = [
+      "Plan your events, live your best life.",
+      "Every event you schedule is a step closer to success.",
+      "Organization is the key to stress-free events.",
+      "A well-planned day is a productive day.",
+      "Small plans lead to big celebrations."
+    ];
+
+    function showRandomEventQuote() {
+      eventQuote.textContent = eventQuotes[Math.floor(Math.random() * eventQuotes.length)];
+    }
+
+    showRandomEventQuote();
+    setInterval(showRandomEventQuote, 15000);
+
+    function updateEventStats() {
+      const now = new Date();
+      eventsAdded.textContent = events.length;
+      eventsUpcoming.textContent = events.filter(e => new Date(e.time) > now).length;
+      eventsPast.textContent = events.filter(e => new Date(e.time) <= now).length;
+    }
+
+    function renderEvents() {
+      eventList.innerHTML = '';
+      events.forEach((e, idx) => {
+        const div = document.createElement('div');
+        div.className = "theme-card p-3 rounded-2xl shadow-md flex items-center justify-between space-x-3";
+        div.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <input type="checkbox" ${e.done ? 'checked' : ''} class="w-5 h-5">
+            <div>
+              <p class="font-medium theme-text">${e.title} <span class="theme-secondary-text text-sm">${new Date(e.time).toLocaleString()}</span></p>
+              ${e.desc ? `<p class="theme-secondary-text text-sm">${e.desc}</p>` : ''}
+            </div>
+          </div>
+          <button class="theme-danger-text hover:opacity-75">Delete</button>
+        `;
+        div.querySelector('input[type="checkbox"]').addEventListener('change', eChk => {
+          events[idx].done = eChk.target.checked;
+          updateEventStats();
+        });
+        div.querySelector('button').addEventListener('click', () => {
+          events.splice(idx, 1);
+          renderEvents();
+          updateEventStats();
+        });
+        eventList.appendChild(div);
+      });
+      updateEventStats();
+    }
+
+    addEventBtn.addEventListener('click', () => {
+      if(!eventCategory.value) { alert("Please select a category!"); return; }
+      if(!eventTitle.value.trim()) { alert("Event title required!"); return; }
+      if(!eventTime.value) { alert("Please select a date and time!"); return; }
+
+      events.push({
+        title: eventTitle.value.trim(),
+        desc: eventDesc.value.trim(),
+        category: eventCategory.value,
+        time: eventTime.value,
+        done: false
+      });
+
+      eventTitle.value = '';
+      eventDesc.value = '';
+      eventTime.value = '';
+      eventCategory.value = '';
+      renderEvents();
+    });
+
+    clearEventsBtn.addEventListener('click', () => {
+      if(confirm("Are you sure you want to clear all events?")) {
+        events = [];
+        renderEvents();
+      }
+    });
+
+    document.addEventListener('themeChanged', renderEvents);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>★ My Favourites</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="min-h-screen flex flex-col p-6 bg-gray-50">
+
+  <div class="flex items-center gap-3 mb-6">
+    <svg class="w-10 h-10" viewBox="0 0 100 100" fill="none">
+      <path d="M50 20 L55 35 L70 30 L60 45 L75 55 L60 60 L70 75 L55 70 L50 85 L45 70 L30 75 L40 60 L25 55 L40 45 L30 30 L45 35 Z" fill="#FFD700" opacity="0.7"/>
+      <circle cx="50" cy="50" r="3" fill="#FFA500"/>
+    </svg>
+    <h1 id="favHeading" class="text-4xl font-bold">My Favourites</h1>
+  </div>
+
+  <p class="text-gray-600 mb-6 max-w-xl">Save your favorite things here! Add items, keep track, and revisit your favorites anytime.</p>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+    <div class="flex-1 space-y-4">
+      <input type="text" id="favTitle" placeholder="Favorite item title..." class="w-full px-4 py-3 rounded-2xl border focus:ring focus:ring-yellow-300 outline-none"/>
+      <textarea id="favDesc" rows="3" placeholder="Description (optional)" class="w-full px-4 py-3 rounded-2xl border focus:ring focus:ring-yellow-300 outline-none"></textarea>
+
+      <div class="flex gap-3">
+        <button id="addFavBtn" class="flex-1 px-4 py-2 rounded-xl font-medium transition">Add Favorite</button>
+        <button id="clearFavBtn" class="flex-1 px-4 py-2 rounded-xl font-medium transition">Clear All</button>
+      </div>
+
+      <div id="favListWrapper" class="mt-4 max-h-[500px] overflow-y-auto space-y-2">
+        <div id="favList"></div>
+      </div>
+
+      <div id="emptyFavState" class="hidden p-4 rounded-2xl shadow-md text-center">
+        <p class="mb-4 font-medium text-gray-600">No favorites yet. Add something you love!</p>
+        <button id="emptyFavAddBtn" class="px-4 py-2 rounded-xl font-medium transition">Add Your First Favorite</button>
+      </div>
+    </div>
+
+    <div class="w-full lg:w-64 space-y-4">
+      <div id="favStatsBox" class="p-4 rounded-2xl shadow-md space-y-2 text-center">
+        <h3 class="font-semibold">Total Favorites: <span id="favTotal">0</span></h3>
+      </div>
+      <div id="favQuote" class="p-4 rounded-2xl shadow-md italic text-center transition-opacity duration-500"></div>
+    </div>
+  </div>
+
+  <script>
+  const favTitle = document.getElementById('favTitle');
+  const favDesc = document.getElementById('favDesc');
+  const addFavBtn = document.getElementById('addFavBtn');
+  const clearFavBtn = document.getElementById('clearFavBtn');
+  const favList = document.getElementById('favList');
+  const favTotal = document.getElementById('favTotal');
+  const favQuote = document.getElementById('favQuote');
+  const emptyFavState = document.getElementById('emptyFavState');
+  const emptyFavAddBtn = document.getElementById('emptyFavAddBtn');
+
+  let favourites = [];
+
+  const favQuotes = [
+    "Collect moments, not things.",
+    "Favorite things make life brighter.",
+    "Happiness is found in simple favorites.",
+    "Keep what you love close.",
+    "Joy is in the little things."
+  ];
+
+  function showRandomFavQuote() {
+    favQuote.textContent = favQuotes[Math.floor(Math.random() * favQuotes.length)];
+  }
+  showRandomFavQuote();
+  setInterval(showRandomFavQuote, 15000);
+
+  function updateFavStats() {
+    favTotal.textContent = favourites.length;
+    emptyFavState.classList.toggle("hidden", favourites.length > 0);
+  }
+
+  function renderFav() {
+    favList.innerHTML = '';
+    favourites.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = "p-3 rounded-2xl shadow-md flex items-center justify-between";
+      div.innerHTML = `
+        <div>
+          <p class="font-medium">${item.title}</p>
+          ${item.desc ? `<p class="text-sm opacity-75">${item.desc}</p>` : ''}
+        </div>
+        <button class="deleteFavBtn px-2 py-1 rounded text-sm font-medium">Delete</button>
+      `;
+      div.querySelector('.deleteFavBtn').addEventListener('click', () => {
+        favourites.splice(idx, 1);
+        renderFav();
+        updateFavStats();
+      });
+      favList.appendChild(div);
+    });
+    updateFavStats();
+    applyFavTheme(currentFavPalette);
+  }
+
+  addFavBtn.addEventListener('click', () => {
+    if (!favTitle.value.trim()) return alert("Please enter a title!");
+    favourites.push({ title: favTitle.value.trim(), desc: favDesc.value.trim() });
+    favTitle.value = '';
+    favDesc.value = '';
+    renderFav();
+  });
+
+  emptyFavAddBtn.addEventListener('click', () => favTitle.focus());
+
+  clearFavBtn.addEventListener('click', () => {
+    if (favourites.length === 0) return;
+    if (confirm("Clear all favorite items?")) {
+      favourites = [];
+      renderFav();
+    }
+  });
+
+  const favPalettes = {
+    yellow: { heading: "text-yellow-600", button: "bg-yellow-400 text-white hover:bg-yellow-500", widget: "bg-yellow-100" },
+    blue: { heading: "text-blue-700", button: "bg-blue-500 text-white hover:bg-blue-600", widget: "bg-blue-100" },
+    pink: { heading: "text-pink-600", button: "bg-pink-400 text-white hover:bg-pink-500", widget: "bg-pink-100" }
+  };
+
+  let currentFavPalette = favPalettes.yellow;
+
+  function applyFavTheme(palette) {
+    currentFavPalette = palette;
+    document.getElementById("favHeading").className = "text-4xl font-bold " + palette.heading;
+    addFavBtn.className = "flex-1 px-4 py-2 rounded-xl font-medium transition " + palette.button;
+    clearFavBtn.className = "flex-1 px-4 py-2 rounded-xl font-medium transition " + palette.button;
+    document.querySelectorAll("#favList > div").forEach(card => {
+      card.className = "p-3 rounded-2xl shadow-md flex items-center justify-between " + palette.widget;
+      const delBtn = card.querySelector(".deleteFavBtn");
+      if (delBtn) delBtn.className = "px-2 py-1 rounded text-sm font-medium " + palette.button;
+    });
+    document.getElementById("favStatsBox").className = "p-4 rounded-2xl shadow-md space-y-2 text-center " + palette.widget;
+    favQuote.className = "p-4 rounded-2xl shadow-md italic text-center transition-opacity duration-500 " + palette.widget;
+    emptyFavState.className = "p-4 rounded-2xl shadow-md text-center " + palette.widget;
+    emptyFavAddBtn.className = "px-4 py-2 rounded-xl font-medium transition " + palette.button;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("selectedTheme") || "yellow";
+    applyFavTheme(favPalettes[savedTheme]);
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mood Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex items-center gap-3 mb-6">
+      <svg class="w-10 h-10" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="40" fill="#FFD700" opacity="0.7"/>
+        <circle cx="35" cy="45" r="5" fill="#000"/>
+        <circle cx="65" cy="45" r="5" fill="#000"/>
+        <path d="M35 65 Q50 80 65 65" stroke="#000" stroke-width="3" fill="transparent"/>
+      </svg>
+      <h1 id="moodHeading" class="text-4xl font-bold text-yellow-500">Mood Tracker</h1>
+    </div>
+
+    <p class="text-gray-600 mb-6 max-w-xl">
+      Track your mood daily and see patterns over time. Choose your mood, add a note, and make it colorful!
+    </p>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+      <div class="flex-1 space-y-4">
+        <div class="flex gap-3 justify-around">
+          <button class="moodBtn p-4 rounded-full transition transform hover:scale-110" data-mood="happy" style="background-color:#FFD700;">
+            <svg class="w-8 h-8 mx-auto" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" fill="#FFF176"/>
+              <circle cx="35" cy="40" r="5" fill="#000"/>
+              <circle cx="65" cy="40" r="5" fill="#000"/>
+              <path d="M35 60 Q50 75 65 60" stroke="#000" stroke-width="3" fill="transparent"/>
+            </svg>
+          </button>
+
+          <button class="moodBtn p-4 rounded-full transition transform hover:scale-110" data-mood="sad" style="background-color:#87CEEB;">
+            <svg class="w-8 h-8 mx-auto" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" fill="#B3E5FC"/>
+              <circle cx="35" cy="40" r="5" fill="#000"/>
+              <circle cx="65" cy="40" r="5" fill="#000"/>
+              <path d="M35 70 Q50 55 65 70" stroke="#000" stroke-width="3" fill="transparent"/>
+            </svg>
+          </button>
+
+          <button class="moodBtn p-4 rounded-full transition transform hover:scale-110" data-mood="angry" style="background-color:#FF6347;">
+            <svg class="w-8 h-8 mx-auto" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" fill="#FF8A65"/>
+              <path d="M30 35 Q40 30 50 35" stroke="#000" stroke-width="3" fill="transparent"/>
+              <path d="M50 35 Q60 30 70 35" stroke="#000" stroke-width="3" fill="transparent"/>
+              <path d="M35 70 Q50 60 65 70" stroke="#000" stroke-width="3" fill="transparent"/>
+            </svg>
+          </button>
+
+          <button class="moodBtn p-4 rounded-full transition transform hover:scale-110" data-mood="relaxed" style="background-color:#98FB98;">
+            <svg class="w-8 h-8 mx-auto" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" fill="#A5D6A7"/>
+              <circle cx="35" cy="45" r="5" fill="#000"/>
+              <circle cx="65" cy="45" r="5" fill="#000"/>
+              <path d="M35 60 Q50 65 65 60" stroke="#000" stroke-width="3" fill="transparent"/>
+            </svg>
+          </button>
+
+          <button class="moodBtn p-4 rounded-full transition transform hover:scale-110" data-mood="excited" style="background-color:#FFB6C1;">
+            <svg class="w-8 h-8 mx-auto" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" fill="#F8BBD0"/>
+              <circle cx="35" cy="40" r="5" fill="#000"/>
+              <circle cx="65" cy="40" r="5" fill="#000"/>
+              <path d="M30 65 Q50 90 70 65" stroke="#000" stroke-width="3" fill="transparent"/>
+              <path d="M50 20 L50 30 M30 25 L35 35 M70 25 L65 35" stroke="#000" stroke-width="3"/>
+            </svg>
+          </button>
+        </div>
+
+        <textarea id="moodNote" rows="3" placeholder="Add a note about your mood..." class="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-300"></textarea>
+
+        <div class="flex gap-3">
+          <button id="addMoodBtn" class="flex-1 px-4 py-2 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-400 transition">Add Mood</button>
+          <button id="clearMoodBtn" class="flex-1 px-4 py-2 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-400 transition">Clear All</button>
+        </div>
+
+        <div id="moodListWrapper" class="mt-4 max-h-[500px] overflow-y-auto space-y-2">
+          <div id="moodList"></div>
+        </div>
+      </div>
+
+      <div class="w-full lg:w-64 space-y-4">
+        <div class="bg-white p-4 rounded-2xl shadow-md space-y-2 text-center">
+          <h3 class="font-semibold text-gray-700">Moods Logged: <span id="moodsLogged">0</span></h3>
+          <h3 class="font-semibold text-gray-700">Most Frequent Mood: <span id="mostMood">-</span></h3>
+        </div>
+
+        <div id="moodQuote" class="bg-white p-4 rounded-2xl shadow-md text-gray-600 italic text-center transition-opacity duration-500"></div>
+        <canvas id="moodChart" class="bg-white p-4 rounded-2xl shadow-md"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const moodBtns = document.querySelectorAll('.moodBtn');
+    const moodNote = document.getElementById('moodNote');
+    const addMoodBtn = document.getElementById('addMoodBtn');
+    const clearMoodBtn = document.getElementById('clearMoodBtn');
+    const moodList = document.getElementById('moodList');
+    const moodsLogged = document.getElementById('moodsLogged');
+    const mostMood = document.getElementById('mostMood');
+    const moodQuote = document.getElementById('moodQuote');
+    const moodChart = document.getElementById('moodChart');
+
+    let selectedMood = null;
+    let moods = [];
+    let moodHistory = [];
+
+    const quotes = [
+      "Keep smiling, it suits you!",
+      "Every mood has its story.",
+      "Happiness is homemade.",
+      "Feelings are the colors of your soul.",
+      "A sad moment today makes a joyful tomorrow."
+    ];
+
+    moodBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedMood = btn.dataset.mood;
+        moodBtns.forEach(b => b.classList.remove('ring-4', 'ring-yellow-400'));
+        btn.classList.add('ring-4', 'ring-yellow-400');
+      });
+    });
+
+    addMoodBtn.addEventListener('click', () => {
+      if(!selectedMood) { alert("Please select a mood!"); return; }
+
+      const newMood = {
+        mood: selectedMood,
+        note: moodNote.value.trim(),
+        time: new Date()
+      };
+      moods.push(newMood);
+      moodHistory.push({date: newMood.time.toLocaleDateString(), mood: newMood.mood});
+      renderMoods();
+      moodNote.value = '';
+      selectedMood = null;
+      moodBtns.forEach(b => b.classList.remove('ring-4', 'ring-yellow-400'));
+    });
+
+    clearMoodBtn.addEventListener('click', () => {
+      if(confirm("Clear all moods?")) {
+        moods = [];
+        moodHistory = [];
+        renderMoods();
+      }
+    });
+
+    function renderMoods() {
+      moodList.innerHTML = '';
+      const moodCount = {};
+      moods.forEach((m, idx) => {
+        moodCount[m.mood] = (moodCount[m.mood] || 0) + 1;
+        const div = document.createElement('div');
+        div.className = "bg-white p-3 rounded-2xl shadow-md flex items-center justify-between";
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6">${getMoodSVG(m.mood)}</span>
+            <div>
+              <p class="font-medium">${m.mood.charAt(0).toUpperCase() + m.mood.slice(1)} <span class="text-gray-400 text-sm">${m.time.toLocaleString()}</span></p>
+              ${m.note ? `<p class="text-gray-500 text-sm">${m.note}</p>` : ''}
+            </div>
+          </div>
+          <button class="text-red-500 hover:text-red-700">Delete</button>
+        `;
+        div.querySelector('button').addEventListener('click', () => {
+          moods.splice(idx, 1);
+          renderMoods();
+        });
+        moodList.appendChild(div);
+      });
+
+      moodsLogged.textContent = moods.length;
+      let maxCount = 0, frequentMood = '-';
+      for(const m in moodCount) {
+        if(moodCount[m] > maxCount) {
+          maxCount = moodCount[m];
+          frequentMood = m.charAt(0).toUpperCase() + m.slice(1);
+        }
+      }
+      mostMood.textContent = frequentMood;
+      showRandomMoodQuote();
+      updateMoodChart();
+    }
+
+    function getMoodSVG(mood) {
+      switch(mood) {
+        case 'happy': return `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#FFF176"/><circle cx="35" cy="40" r="5" fill="#000"/><circle cx="65" cy="40" r="5" fill="#000"/><path d="M35 60 Q50 75 65 60" stroke="#000" stroke-width="3"/></svg>`;
+        case 'sad': return `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#B3E5FC"/><circle cx="35" cy="40" r="5" fill="#000"/><circle cx="65" cy="40" r="5" fill="#000"/><path d="M35 70 Q50 55 65 70" stroke="#000" stroke-width="3"/></svg>`;
+        case 'angry': return `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#FF8A65"/><path d="M30 35 Q40 30 50 35"/><path d="M50 35 Q60 30 70 35"/><path d="M35 70 Q50 60 65 70"/></svg>`;
+        case 'relaxed': return `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#A5D6A7"/><circle cx="35" cy="45" r="5"/><circle cx="65" cy="45" r="5"/><path d="M35 60 Q50 65 65 60"/></svg>`;
+        case 'excited': return `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#F8BBD0"/><circle cx="35" cy="40" r="5"/><circle cx="65" cy="40" r="5"/><path d="M30 65 Q50 90 70 65"/></svg>`;
+        default: return `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#E0E0E0"/></svg>`;
+      }
+    }
+
+    function showRandomMoodQuote() {
+      moodQuote.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+    }
+
+    let chartInstance = null;
+    function updateMoodChart() {
+      const labels = [...new Set(moodHistory.map(m => m.date))];
+      const dataCounts = labels.map(date => moodHistory.filter(m => m.date === date).length);
+
+      if(chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(moodChart, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Moods Logged', data: dataCounts, backgroundColor: '#FFD700' }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    showRandomMoodQuote();
+    setInterval(showRandomMoodQuote, 15000);
+  </script>
+</body>
+</html>

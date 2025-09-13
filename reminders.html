@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reminders</title>
+  <script src="theme.js"></script> 
+  <link rel="stylesheet" href="theme.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[var(--bg-color)] text-[var(--text-color)] transition-colors duration-300">
+
+  <div class="p-6 max-w-5xl">
+  
+    <div class="flex items-center gap-3 mb-6">
+      <svg class="w-10 h-10 text-[var(--accent-color)]" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z" opacity="0.8"/>
+    <path fill="currentColor" d="M18 16v-5a6 6 0 10-12 0v5l-2 2h16l-2-2z"/>
+  </svg>
+      <h1 id="reminderHeading" class="text-4xl font-bold" style="color: var(--accent-dark)">Reminders</h1>
+    </div>
+    <p class="mb-6 max-w-xl text-[var(--text-muted)]">
+      Set reminders for important tasks or events. Choose a category, time, and note to stay on top of your schedule!
+    </p>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+     
+      <div class="flex-1 space-y-4">
+                <div class="flex justify-between items-center">
+          <select id="reminderCategory" class="px-3 py-2 rounded-xl border border-gray-300 bg-[var(--card-bg)] text-[var(--text-color)]">
+            <option value="">Select Category</option>
+            <option value="personal">Personal</option>
+            <option value="work">Work</option>
+            <option value="health">Health</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="datetime-local" id="reminderTime" class="px-3 py-2 rounded-xl border border-gray-300 bg-[var(--card-bg)] text-[var(--text-color)]"/>
+        </div>
+
+  
+        <input type="text" id="reminderTitle" placeholder="Reminder Title..." 
+          class="w-full px-4 py-3 rounded-2xl border border-gray-300 bg-[var(--card-bg)] text-[var(--text-color)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"/>
+        <textarea id="reminderDesc" rows="3" placeholder="Reminder Note (optional)" 
+          class="w-full px-4 py-3 rounded-2xl border border-gray-300 bg-[var(--card-bg)] text-[var(--text-color)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"></textarea>
+
+        <div class="flex gap-3">
+          <button id="addReminderBtn" class="flex-1 px-4 py-2 rounded-xl text-gray font-medium bg-[var(--accent-color)] hover:opacity-90 transition">Add Reminder</button>
+          <button id="clearRemindersBtn" class="flex-1 px-4 py-2 rounded-xl text-gray font-medium bg-[var(--accent-dark)] hover:opacity-90 transition">Clear All</button>
+        </div>
+
+
+        <div id="reminderListWrapper" class="mt-4 max-h-[500px] overflow-y-auto space-y-2">
+          <div id="reminderList"></div>
+        </div>
+      </div>
+      <div class="w-full lg:w-64 space-y-4">
+        <div class="bg-[var(--card-bg)] p-4 rounded-2xl shadow-md space-y-2">
+          <h3 class="font-semibold text-[var(--text-color)]">Reminders Added: <span id="remindersAdded">0</span></h3>
+          <h3 class="font-semibold text-[var(--text-color)]">Upcoming: <span id="remindersUpcoming">0</span></h3>
+          <h3 class="font-semibold text-[var(--text-color)]">Past: <span id="remindersPast">0</span></h3>
+        </div>
+
+        <div id="reminderQuote" class="bg-[var(--card-bg)] p-4 rounded-2xl shadow-md text-[var(--text-muted)] italic text-center transition-opacity duration-500"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const pastelThemeColors = {
+    personal: { text: 'text-pink-600', btn: 'bg-pink-500 hover:bg-pink-400' },
+    work: { text: 'text-blue-600', btn: 'bg-blue-500 hover:bg-blue-400' },
+    health: { text: 'text-green-600', btn: 'bg-green-500 hover:bg-green-400' },
+    other: { text: 'text-purple-600', btn: 'bg-purple-500 hover:bg-purple-400' }
+  };
+
+  const categoryIcons = {
+    personal: '<svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L15 8H21L16 12L18 18L12 14L6 18L8 12L3 8H9L12 2Z"/></svg>',
+    work: '<svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
+    health: '<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4 12l6 6L20 6"/></svg>',
+    other: '<svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L15 8H21L16 12L18 18L12 14L6 18L8 12L3 8H9L12 2Z"/></svg>'
+  };
+
+  const reminderCategory = document.getElementById('reminderCategory');
+  const reminderTime = document.getElementById('reminderTime');
+  const reminderTitle = document.getElementById('reminderTitle');
+  const reminderDesc = document.getElementById('reminderDesc');
+  const addReminderBtn = document.getElementById('addReminderBtn');
+  const clearRemindersBtn = document.getElementById('clearRemindersBtn');
+  const reminderList = document.getElementById('reminderList');
+  const remindersAdded = document.getElementById('remindersAdded');
+  const remindersUpcoming = document.getElementById('remindersUpcoming');
+  const remindersPast = document.getElementById('remindersPast');
+  const reminderQuote = document.getElementById('reminderQuote');
+
+  let reminders = [];
+
+  const reminderQuotes = [
+    "Don't forget: every task completed is progress.",
+    "Stay ahead, one reminder at a time.",
+    "A little planning prevents a lot of forgetting.",
+    "Remind yourself today for a better tomorrow.",
+    "Consistency beats memory every time."
+  ];
+
+  function showRandomReminderQuote() {
+    reminderQuote.textContent = reminderQuotes[Math.floor(Math.random() * reminderQuotes.length)];
+  }
+
+  showRandomReminderQuote();
+  setInterval(showRandomReminderQuote, 15000);
+
+  function updateReminderStats() {
+    const now = new Date();
+    remindersAdded.textContent = reminders.length;
+    remindersUpcoming.textContent = reminders.filter(r => new Date(r.time) > now).length;
+    remindersPast.textContent = reminders.filter(r => new Date(r.time) <= now).length;
+  }
+
+  function renderReminders() {
+    reminderList.innerHTML = '';
+    reminders.forEach((r, idx) => {
+      const div = document.createElement('div');
+      div.className = "bg-[var(--card-bg)] p-3 rounded-2xl shadow-md flex items-center justify-between space-x-3";
+      div.innerHTML = `
+        <div class="flex items-center space-x-3">
+          ${categoryIcons[r.category] || ''}
+          <input type="checkbox" ${r.done ? 'checked' : ''} class="w-5 h-5">
+          <div>
+            <p class="font-medium">${r.title} <span class="text-gray-400 text-sm">${new Date(r.time).toLocaleString()}</span></p>
+            ${r.desc ? `<p class="text-[var(--text-muted)] text-sm">${r.desc}</p>` : ''}
+          </div>
+        </div>
+        <button class="text-red-500 hover:text-red-700">Delete</button>
+      `;
+      div.querySelector('input[type="checkbox"]').addEventListener('change', e => {
+        reminders[idx].done = e.target.checked;
+        updateReminderStats();
+      });
+      div.querySelector('button').addEventListener('click', () => {
+        reminders.splice(idx, 1);
+        renderReminders();
+        updateReminderStats();
+      });
+      reminderList.appendChild(div);
+    });
+    updateReminderStats();
+  }
+
+  addReminderBtn.addEventListener('click', () => {
+    if(!reminderCategory.value) { alert("Please select a category!"); return; }
+    if(!reminderTitle.value.trim()) { alert("Reminder title required!"); return; }
+    if(!reminderTime.value) { alert("Please select a time!"); return; }
+
+    const newReminder = {
+      title: reminderTitle.value.trim(),
+      desc: reminderDesc.value.trim(),
+      category: reminderCategory.value,
+      time: reminderTime.value,
+      done: false
+    };
+    reminders.push(newReminder);
+
+    reminderTitle.value = '';
+    reminderDesc.value = '';
+    reminderTime.value = '';
+    reminderCategory.value = '';
+    renderReminders();
+  });
+
+  clearRemindersBtn.addEventListener('click', () => {
+    if(confirm("Are you sure you want to clear all reminders?")) {
+      reminders = [];
+      renderReminders();
+    }
+  });
+  </script>
+</body>
+</html>

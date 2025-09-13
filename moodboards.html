@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mood Boards</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="antialiased bg-white text-gray-800">
+
+  <div class="text-left mb-8">
+    <h3 id="moodBoardSectionHeading" class="text-4xl font-bold text-pink-600 mt-6 mb-3 flex items-center justify-left gap-3">
+      ꩜ .ᐟ Mood Boards
+    </h3>
+    <p class="text-lg text-gray-600 max-w-md flex items-center gap-2">
+      Create beautiful collections of your favorite things, dreams, and inspirations!
+      <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+        <circle cx="30" cy="30" r="28"></circle>
+      </svg>
+    </p>
+  </div>
+
+  <div id="moodBoardsContent" class="p-6">
+    <div class="flex gap-4 mb-6">
+      <div class="bg-white rounded-lg p-3 shadow-sm flex-1 text-center">
+        <div class="text-2xl font-bold text-pink-500" id="totalBoards">0</div>
+        <div class="text-xs text-gray-500">Total Boards</div>
+      </div>
+      <div class="bg-white rounded-lg p-3 shadow-sm flex-1 text-center">
+        <div class="text-2xl font-bold text-purple-500" id="totalImages">0</div>
+        <div class="text-xs text-gray-500">Images Added</div>
+      </div>
+      <div class="bg-white rounded-lg p-3 shadow-sm flex-1 text-center">
+        <div class="text-2xl font-bold text-yellow-500" id="recentBoards">0</div>
+        <div class="text-xs text-gray-500">This Week</div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-3 mb-6">
+      <button id="createBoardBtn" class="px-4 py-2 bg-pink-400 text-white rounded-xl hover:bg-pink-300 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Create New Board
+      </button>
+
+      <select id="sortBoards" class="px-3 py-2 bg-white rounded-xl border border-gray-200 text-sm">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="name">By Name</option>
+        <option value="images">Most Images</option>
+      </select>
+
+      <button id="gridViewBtn" class="px-3 py-2 bg-gray-100 rounded-xl hover:bg-gray-200 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+        </svg>
+      </button>
+
+      <button id="listViewBtn" class="px-3 py-2 bg-white rounded-xl border border-gray-200 hover:bg-gray-50 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="templateSuggestions" class="mb-6">
+      <h3 class="text-lg font-semibold mb-4">✨ Get Started with Templates</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <button class="template-btn bg-gradient-to-r from-pink-100 to-pink-200 p-4 rounded-xl hover:scale-105 transition-transform text-left">
+          <div class="text-2xl mb-2">💕</div>
+          <div class="font-medium text-sm">Self Love</div>
+          <div class="text-xs text-gray-500">Affirmations & positivity</div>
+        </button>
+
+        <button class="template-btn bg-gradient-to-r from-purple-100 to-purple-200 p-4 rounded-xl hover:scale-105 transition-transform text-left">
+          <div class="text-2xl mb-2">✈️</div>
+          <div class="font-medium text-sm">Travel Dreams</div>
+          <div class="text-xs text-gray-500">Places to visit</div>
+        </button>
+
+        <button class="template-btn bg-gradient-to-r from-yellow-100 to-yellow-200 p-4 rounded-xl hover:scale-105 transition-transform text-left">
+          <div class="text-2xl mb-2">🎨</div>
+          <div class="font-medium text-sm">Art & Style</div>
+          <div class="text-xs text-gray-500">Creative inspiration</div>
+        </button>
+
+        <button class="template-btn bg-gradient-to-r from-green-100 to-green-200 p-4 rounded-xl hover:scale-105 transition-transform text-left">
+          <div class="text-2xl mb-2">🌱</div>
+          <div class="font-medium text-sm">Growth Goals</div>
+          <div class="text-xs text-gray-500">Personal development</div>
+        </button>
+      </div>
+    </div>
+
+    <div id="moodBoardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    <div id="emptyState" class="text-center py-12 hidden">
+      <div class="text-6xl mb-4">🎨</div>
+      <h3 class="text-xl font-semibold mb-2">No mood boards yet</h3>
+      <p class="text-gray-500 mb-6">Start creating your visual inspiration collection!</p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button class="create-first-board px-6 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-300">Create Your First Board</button>
+        <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200">Browse Templates</button>
+      </div>
+    </div>
+
+    <div id="recentlyViewed" class="mt-8 hidden">
+      <h3 class="text-lg font-semibold mb-4">📖 Recently Viewed</h3>
+      <div class="flex gap-3 overflow-x-auto pb-2"></div>
+    </div>
+    <div id="colorPalettes" class="mt-8">
+      <h3 class="text-lg font-semibold mb-4">🎨 Color Inspiration</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl p-3 shadow-sm">
+          <div class="flex gap-1 mb-2">
+            <div class="w-8 h-8 rounded-full bg-pink-300"></div>
+            <div class="w-8 h-8 rounded-full bg-pink-400"></div>
+            <div class="w-8 h-8 rounded-full bg-pink-500"></div>
+          </div>
+          <div class="text-sm font-medium">Pink Blush</div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3 shadow-sm">
+          <div class="flex gap-1 mb-2">
+            <div class="w-8 h-8 rounded-full bg-blue-300"></div>
+            <div class="w-8 h-8 rounded-full bg-blue-400"></div>
+            <div class="w-8 h-8 rounded-full bg-blue-500"></div>
+          </div>
+          <div class="text-sm font-medium">Ocean Waves</div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3 shadow-sm">
+          <div class="flex gap-1 mb-2">
+            <div class="w-8 h-8 rounded-full bg-purple-300"></div>
+            <div class="w-8 h-8 rounded-full bg-purple-400"></div>
+            <div class="w-8 h-8 rounded-full bg-purple-500"></div>
+          </div>
+          <div class="text-sm font-medium">Lavender Dreams</div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3 shadow-sm">
+          <div class="flex gap-1 mb-2">
+            <div class="w-8 h-8 rounded-full bg-green-300"></div>
+            <div class="w-8 h-8 rounded-full bg-green-400"></div>
+            <div class="w-8 h-8 rounded-full bg-green-500"></div>
+          </div>
+          <div class="text-sm font-medium">Fresh Mint</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tipsSection" class="mt-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span>💡</span> Mood Board Tips
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="flex items-start gap-3">
+          <div class="w-2 h-2 bg-pink-400 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <div class="font-medium">Mix textures and patterns</div>
+            <div class="text-gray-600">Combine photos, colors, and text for variety</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <div class="font-medium">Choose a theme or feeling</div>
+            <div class="text-gray-600">Focus on one mood or aesthetic</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <div class="font-medium">Add meaningful quotes</div>
+            <div class="text-gray-600">Include text that inspires you</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+          <div>
+            <div class="font-medium">Update regularly</div>
+            <div class="text-gray-600">Keep your boards fresh and evolving</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  let boards = [];
+  const grid = document.getElementById("moodBoardsGrid");
+  const createBtn = document.getElementById("createBoardBtn");
+  const emptyState = document.getElementById("emptyState");
+  const templateSuggestions = document.getElementById("templateSuggestions");
+  const moodBoardHeading = document.getElementById("moodBoardSectionHeading");
+  const pastelThemeColors = {
+    pink: { text: 'text-pink-600', svg: ['#FFD1DC','#FFB6C1','#FFB6C1','#FF69B4','#FFB6C1','#FFF'] },
+    blue: { text: 'text-blue-600', svg: ['#AEC6CF','#89CFF0','#89CFF0','#1E90FF','#87CEFA','#E0FFFF'] },
+    yellow: { text: 'text-yellow-600', svg: ['#FFFACD','#FAFAD2','#FAFAD2','#FFF700','#FFFF99','#FFFFE0'] },
+    green: { text: 'text-green-600', svg: ['#C1E1C1','#B4E7B0','#B4E7B0','#90EE90','#98FB98','#CCFFCC'] },
+    red: { text: 'text-red-600', svg: ['#FFCCCB','#FFB3AB','#FFB3AB','#FF6F61','#FF9999','#FFC0CB'] },
+    orange: { text: 'text-orange-600', svg: ['#FFD8B1','#FFC980','#FFC980','#FFA500','#FFD580','#FFE5B4'] },
+    purple: { text: 'text-purple-600', svg: ['#E3C1FF','#D8B0FF','#D8B0FF','#DA70D6','#E6C2FF','#F0E6FF'] }
+  };
+  function updateMoodBoardHeading(themeName) {
+    const theme = pastelThemeColors[themeName] || pastelThemeColors.pink;
+
+    if (moodBoardHeading) {
+      moodBoardHeading.className = "text-4xl font-bold text-left mt-6 mb-3 flex items-center justify-left gap-3 " + theme.text;
+      const containers = [
+        moodBoardHeading,
+        moodBoardHeading.parentElement,
+        document.getElementById('moodBoardsContent'),
+        document
+      ];
+
+      const svgs = new Set();
+      containers.forEach(c => {
+        if (!c) return;
+        c.querySelectorAll && c.querySelectorAll('svg').forEach(s => svgs.add(s));
+      });
+
+      Array.from(svgs).forEach((svg, sIdx) => {
+        const paths = svg.querySelectorAll('path, circle, rect, ellipse');
+        paths.forEach((el, pIdx) => {
+          const color = theme.svg[(sIdx * paths.length) + pIdx] || theme.svg[pIdx] || null;
+          if (color) {
+            try { el.setAttribute('fill', color); } catch (e) {}
+          }
+        });
+      });
+    }
+  }
+  function updateStats() {
+    document.getElementById('totalBoards').textContent = boards.length;
+    document.getElementById('totalImages').textContent = boards.reduce((sum, board) => sum + (board.images?.length || 0), 0);
+
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recentCount = boards.filter(board => new Date(board.created) > weekAgo).length;
+    document.getElementById('recentBoards').textContent = recentCount;
+  }
+
+  function renderBoards() {
+    if (!grid) return;
+    if (boards.length === 0) {
+      grid.style.display = 'none';
+      if (emptyState) emptyState.classList.remove('hidden');
+      if (templateSuggestions) templateSuggestions.classList.remove('hidden');
+      return;
+    }
+
+    grid.style.display = 'grid';
+    if (emptyState) emptyState.classList.add('hidden');
+    if (templateSuggestions) templateSuggestions.classList.add('hidden');
+    grid.innerHTML = "";
+
+    boards.forEach((board, idx) => {
+      const card = document.createElement("div");
+      const colorClasses = {
+        pink: "from-pink-100 to-pink-200",
+        yellow: "from-yellow-100 to-yellow-200",
+        orange: "from-orange-100 to-orange-200",
+        purple: "from-purple-100 to-purple-200",
+        blue: "from-blue-100 to-blue-200",
+        green: "from-green-100 to-green-200"
+      };
+      card.className = `bg-gradient-to-br ${colorClasses[board.color] || colorClasses.pink} p-4 rounded-2xl shadow-md hover:scale-105 transition-transform cursor-pointer relative group`;
+
+      card.innerHTML = `
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="font-semibold text-lg">${board.title}</h3>
+        <button class="delete-board-btn opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600" title="Delete board">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <p class="text-sm text-gray-600 mb-4">${board.description || ""}</p>
+      <div class="grid grid-cols-3 gap-2 mb-4 h-24">
+        ${(board.images || []).slice(0, 6).map(img => `
+          <div class="bg-white rounded-lg overflow-hidden aspect-square">
+            <img src="${img.src}" alt="${img.caption}" class="w-full h-full object-cover"/>
+          </div>
+        `).join('')}
+        ${Array(Math.max(0, 6 - (board.images || []).length)).fill().map(() => `
+          <div class="bg-white/50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </div>
+        `).join('')}
+      </div>
+      <div class="flex gap-2">
+        <button class="add-image-btn flex-1 px-3 py-2 bg-white/70 rounded-lg hover:bg-white text-sm font-medium">+ Add Image</button>
+        <button class="view-board-btn px-3 py-2 bg-white/70 rounded-lg hover:bg-white text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="text-xs text-gray-500 mt-2">
+        ${board.images?.length || 0} images • ${new Date(board.created).toLocaleDateString()}
+      </div>
+      `;
+
+      grid.appendChild(card);
+      const delBtn = card.querySelector(".delete-board-btn");
+      if (delBtn) {
+        delBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (confirm(`Delete board "${board.title}"?`)) {
+            boards.splice(idx, 1);
+            updateStats();
+            renderBoards();
+          }
+        });
+      }
+      const addImgBtn = card.querySelector(".add-image-btn");
+      if (addImgBtn) {
+        addImgBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (!board.images) board.images = [];
+          board.images.push({ src: `https://picsum.photos/200/200?random=${Date.now()}`, caption: "Sample image" });
+          updateStats();
+          renderBoards();
+        });
+      }
+    });
+
+    if (boards.length > 0) updateMoodBoardHeading(boards[boards.length - 1].color);
+    updateStats();
+  }
+  if (createBtn) {
+    createBtn.addEventListener("click", () => {
+      const title = prompt("Enter board title:");
+      if (!title) return;
+      const description = prompt("Enter board description (optional):");
+      const colors = ["pink", "yellow", "orange", "purple", "blue", "green"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+      boards.push({
+        title,
+        description,
+        images: [],
+        created: new Date(),
+        color: randomColor
+      });
+
+      updateStats();
+      renderBoards();
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const templateBtn = e.target.closest('.template-btn');
+    if (!templateBtn) return;
+
+    const templates = [
+      { title: "Self Love", description: "Affirmations and positive vibes", color: "pink" },
+      { title: "Travel Dreams", description: "Places I want to visit", color: "blue" },
+      { title: "Art & Style", description: "Creative inspiration board", color: "purple" },
+      { title: "Growth Goals", description: "Personal development journey", color: "green" }
+    ];
+
+    const index = Array.from(document.querySelectorAll('.template-btn')).indexOf(templateBtn);
+    const template = templates[index];
+    if (!template) return;
+
+    boards.push({ ...template, images: [], created: new Date() });
+    updateStats();
+    renderBoards();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.create-first-board')) {
+      if (createBtn) createBtn.click();
+    }
+  });
+
+  const sortSelect = document.getElementById('sortBoards');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', (e) => {
+      const sortBy = e.target.value;
+      switch (sortBy) {
+        case 'newest': boards.sort((a,b) => new Date(b.created) - new Date(a.created)); break;
+        case 'oldest': boards.sort((a,b) => new Date(a.created) - new Date(b.created)); break;
+        case 'name': boards.sort((a,b) => a.title.localeCompare(b.title)); break;
+        case 'images': boards.sort((a,b) => (b.images?.length || 0) - (a.images?.length || 0)); break;
+      }
+      renderBoards();
+    });
+  }
+
+  setTimeout(() => {
+    boards.push({ title: "Summer Vibes", description: "Bright and sunny inspiration", images: [], created: new Date(), color: "yellow" });
+    boards.push({ title: "Cozy Autumn", description: "Warm and comfortable feelings", images: [], created: new Date(Date.now() - 86400000), color: "orange" });
+    updateStats();
+    renderBoards();
+  }, 100);
+  const moodPalettes = {
+    pink: {
+      heading: "text-pink-600",
+      button: "bg-pink-400 text-white hover:bg-pink-300",
+      widget: "bg-pink-50",
+      templateBg: "from-pink-100 to-pink-200",
+      tipsGradient: "from-pink-50 to-purple-50"
+    },
+    yellow: {
+      heading: "text-yellow-600",
+      button: "bg-yellow-400 text-white hover:bg-yellow-500",
+      widget: "bg-yellow-50",
+      templateBg: "from-yellow-100 to-yellow-200",
+      tipsGradient: "from-yellow-50 to-orange-50"
+    },
+    blue: {
+      heading: "text-blue-600",
+      button: "bg-blue-500 text-white hover:bg-blue-600",
+      widget: "bg-blue-50",
+      templateBg: "from-blue-100 to-blue-200",
+      tipsGradient: "from-blue-50 to-indigo-50"
+    },
+    green: {
+      heading: "text-green-600",
+      button: "bg-green-400 text-white hover:bg-green-500",
+      widget: "bg-green-50",
+      templateBg: "from-green-100 to-green-200",
+      tipsGradient: "from-green-50 to-lime-50"
+    },
+    purple: {
+      heading: "text-purple-600",
+      button: "bg-purple-400 text-white hover:bg-purple-500",
+      widget: "bg-purple-50",
+      templateBg: "from-purple-100 to-purple-200",
+      tipsGradient: "from-purple-50 to-pink-50"
+    },
+    orange: {
+      heading: "text-orange-600",
+      button: "bg-orange-400 text-white hover:bg-orange-500",
+      widget: "bg-orange-50",
+      templateBg: "from-orange-100 to-orange-200",
+      tipsGradient: "from-orange-50 to-yellow-50"
+    }
+  };
+  function applyMoodBoardTheme(palette) {
+    const headingEl = document.getElementById("moodBoardSectionHeading");
+    if (headingEl) headingEl.className = "text-4xl font-bold mt-6 mb-3 flex items-center justify-left gap-3 " + palette.heading;
+    if (createBtn) createBtn.className = "px-4 py-2 rounded-xl flex items-center gap-2 " + palette.button;
+
+    const gridBtn = document.getElementById("gridViewBtn");
+    if (gridBtn) gridBtn.className = "px-3 py-2 rounded-xl text-sm " + palette.widget;
+
+    const listBtn = document.getElementById("listViewBtn");
+    if (listBtn) listBtn.className = "px-3 py-2 rounded-xl text-sm " + palette.widget;
+    document.querySelectorAll("#moodBoardsContent .flex-1").forEach(card => {
+      card.className = "rounded-lg p-3 shadow-sm flex-1 text-center " + palette.widget;
+    });
+    document.querySelectorAll("#templateSuggestions .template-btn").forEach((btn, idx) => {
+      btn.className = `template-btn bg-gradient-to-r ${palette.templateBg} p-4 rounded-xl hover:scale-105 transition-transform text-left`;
+    });
+
+    document.querySelectorAll(".create-first-board").forEach(el => {
+      el.className = "create-first-board px-6 py-3 " + palette.button + " rounded-xl";
+    });
+    const tips = document.getElementById("tipsSection");
+    if (tips) tips.className = "mt-8 bg-gradient-to-r " + palette.tipsGradient + " rounded-2xl p-6";
+
+    document.querySelectorAll("#colorPalettes > div, #colorPalettes .bg-white").forEach(card => {
+
+      if (card.classList.contains('rounded-xl')) {
+        card.className = "rounded-xl p-3 shadow-sm " + palette.widget;
+      }
+    });
+
+    const statsBox = document.getElementById("moodBoardsContent");
+    const statsBoxes = document.querySelectorAll("#moodBoardsContent .rounded-lg, #moodBoardsContent .shadow-sm");
+    statsBoxes.forEach(sb => {
+   
+      if (sb.className.indexOf('rounded-lg') !== -1) {
+                if (!sb.className.includes(palette.widget)) {
+          sb.className = sb.className + ' ' + palette.widget;
+        }
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('selectedTheme') || 'pink';
+    const palette = moodPalettes[savedTheme] || moodPalettes.pink;
+    applyMoodBoardTheme(palette);
+    updateMoodBoardHeading(savedTheme);
+  });
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'selectedTheme') {
+      const newTheme = e.newValue || 'pink';
+      const palette = moodPalettes[newTheme] || moodPalettes.pink;
+      applyMoodBoardTheme(palette);
+      updateMoodBoardHeading(newTheme);
+    }
+  });
+
+  </script>
+</body>
+</html>
